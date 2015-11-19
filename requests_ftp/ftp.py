@@ -257,7 +257,10 @@ class FTPAdapter(requests.adapters.BaseAdapter):
         # method. See self.list().
         data.release_conn = data.close
 
-        code = self.conn.retrbinary('RETR ' + path, data_callback_factory(data))
+        path, filename = os.path.split(path)
+        self.conn.cwd(path)
+
+        code = self.conn.retrbinary('RETR ' + filename, data_callback_factory(data))
 
         response = build_binary_response(request, data, code)
 
