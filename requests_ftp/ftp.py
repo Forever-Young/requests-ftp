@@ -1,18 +1,20 @@
 # -*- encoding: utf-8 -*-
-import requests
-import ftplib
 import base64
-from requests.compat import urlparse
-from requests.hooks import dispatch_hook
-from requests import Response, codes
-from io import BytesIO
 import cgi
+import ftplib
 import os
 import socket
+from io import BytesIO
+from urllib import unquote
 
+import requests
+from requests import Response, codes
+from requests.compat import urlparse
 from requests.exceptions import ConnectionError, ConnectTimeout, ReadTimeout
 from requests.exceptions import RequestException
+from requests.hooks import dispatch_hook
 from requests.utils import prepend_scheme_if_needed
+
 
 class FTPSession(requests.Session):
     def __init__(self):
@@ -260,7 +262,7 @@ class FTPAdapter(requests.adapters.BaseAdapter):
         path, filename = os.path.split(path)
         self.conn.cwd(path)
 
-        code = self.conn.retrbinary('RETR ' + filename, data_callback_factory(data))
+        code = self.conn.retrbinary(unquote('RETR ' + str(filename)), data_callback_factory(data))
 
         response = build_binary_response(request, data, code)
 
